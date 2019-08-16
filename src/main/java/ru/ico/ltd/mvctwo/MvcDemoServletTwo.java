@@ -1,4 +1,4 @@
-package ru.ico.ltd.serlvets;
+package ru.ico.ltd.mvctwo;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -7,22 +7,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
-@WebServlet("/MvcDemoServlet")
-public class MvcDemoServlet extends HttpServlet {
+@WebServlet("/MvcDemoServletTwo")
+public class MvcDemoServletTwo extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // Step 0: Add data
-        String[] students = {"Dino", "Marta", "Crawly", "Betty"};
+        // step 1: get the student data from helper class (model)
+        List<Student> students = StudentDataUtil.getStudents();
+
+        // step 2: add students to request object
         request.setAttribute("student_list", students);
 
-        // Step 1: get Request dispatcher
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/view_students.jsp");
+        // step 3: get request dispatcher
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/view_students_two.jsp");
 
-        // Step 2: forward the request to JSP
+        // step 4: forward to JSP
         dispatcher.forward(request, response);
-
     }
 }
