@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
-    
+
     <context-param>
         <param-name>max-shopping-cart-size</param-name>
         <param-value>99</param-value>
@@ -13,5 +13,12 @@
         <param-name>project-team-name</param-name>
         <param-value>The Coding Gurus</param-value>
     </context-param>
-    
+
+    <display-name>web-student-tracker</display-name>
+    <welcome-file-list>
+        <welcome-file>StudentControllerServlet</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
 </web-app>
