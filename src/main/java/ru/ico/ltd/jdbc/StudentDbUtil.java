@@ -2,6 +2,7 @@ package ru.ico.ltd.jdbc;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -49,6 +50,26 @@ class StudentDbUtil {
             if (rs != null) {
                 rs.close();
             }
+        }
+    }
+
+    void addStudent(Student newStudent) throws Exception {
+
+        // create sql for insert
+        String sql = "insert into student "
+                + "(first_name, last_name, email) "
+                + "values(?, ?, ?)";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement st = connection.prepareStatement(sql)) {
+
+            // set the param values for the student
+            st.setString(1, newStudent.getFirstName());
+            st.setString(2, newStudent.getLastName());
+            st.setString(3, newStudent.getEmail());
+
+            // execute sql insert
+            st.execute();
         }
     }
 }
