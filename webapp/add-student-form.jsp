@@ -15,7 +15,7 @@
 <div id="container">
     <h3>Add Student</h3>
 
-    <form action="StudentControllerServlet" method="get">
+    <form action="StudentControllerServlet" method="post">
         <input type="hidden" name="command" value="ADD"/>
         <table>
             <tbody>
