@@ -1,10 +1,7 @@
 package ru.ico.ltd.jdbc;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,25 +28,29 @@ class StudentDbUtil {
             rs = st.executeQuery(sql);
 
             // process result set
-            while (rs.next()) {
-
-                // retrieve data from result set row
-                int id = rs.getInt("id");
-                String firstName = rs.getString("first_name");
-                String lastName = rs.getString("last_name");
-                String email = rs.getString("email");
-
-                // create new student object
-                Student tempStudent = new Student(id, firstName, lastName, email);
-
-                // add it to the list of students
-                students.add(tempStudent);
-            }
+            processResultSet(students, rs);
             return students;
         } finally {
             if (rs != null) {
                 rs.close();
             }
+        }
+    }
+
+    private void processResultSet(List<Student> students, ResultSet rs) throws SQLException {
+        while (rs.next()) {
+
+            // retrieve data from result set row
+            int id = rs.getInt("id");
+            String firstName = rs.getString("first_name");
+            String lastName = rs.getString("last_name");
+            String email = rs.getString("email");
+
+            // create new student object
+            Student tempStudent = new Student(id, firstName, lastName, email);
+
+            // add it to the list of students
+            students.add(tempStudent);
         }
     }
 
@@ -61,15 +62,15 @@ class StudentDbUtil {
                 + "values(?, ?, ?)";
 
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement st = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             // set the param values for the student
-            st.setString(1, newStudent.getFirstName());
-            st.setString(2, newStudent.getLastName());
-            st.setString(3, newStudent.getEmail());
+            ps.setString(1, newStudent.getFirstName());
+            ps.setString(2, newStudent.getLastName());
+            ps.setString(3, newStudent.getEmail());
 
             // execute sql insert
-            st.execute();
+            ps.execute();
         }
     }
 
@@ -114,16 +115,16 @@ class StudentDbUtil {
         // create SQL for update
         String sql = "update student set first_name=?, last_name=?, email=? where id=?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             // set params
-            preparedStatement.setString(1, theStudent.getFirstName());
-            preparedStatement.setString(2, theStudent.getLastName());
-            preparedStatement.setString(3, theStudent.getEmail());
-            preparedStatement.setInt(4, theStudent.getId());
+            ps.setString(1, theStudent.getFirstName());
+            ps.setString(2, theStudent.getLastName());
+            ps.setString(3, theStudent.getEmail());
+            ps.setInt(4, theStudent.getId());
 
             // execute SQL statement
-            preparedStatement.execute();
+            ps.execute();
         }
     }
 
@@ -133,16 +134,59 @@ class StudentDbUtil {
         String sql = "delete from student where id=?";
 
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             // convert student id to int
             int id = Integer.parseInt(studentId);
 
             // set params
-            preparedStatement.setInt(1, id);
+            ps.setInt(1, id);
 
             // execute sql statement
-            preparedStatement.execute();
+            ps.execute();
         }
+    }
+
+    List<Student> searchStudents(String theSearchName) throws Exception {
+        List<Student> students = new ArrayList<>();
+
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        try (Connection connection = dataSource.getConnection()) {
+
+            // only search ny name if theSearchName is not empty
+            if (theSearchName != null && theSearchName.trim().length() > 0) {
+
+                // create sql to search for students by name
+                String sql = "select * from student where lower(first_name) like ? or lower(last_name) like ?";
+
+                // create prepare statement
+                ps = connection.prepareStatement(sql);
+
+                // set params
+                String theSearchNameLike = "%" + theSearchName + "%";
+                ps.setString(1, theSearchNameLike);
+                ps.setString(2, theSearchNameLike);
+            } else {
+
+                // create sql to get all students
+                String sql = "select * from student order by last_name";
+
+                // create prepared statement
+                ps = connection.prepareStatement(sql);
+            }
+
+            // execute statement
+            rs = ps.executeQuery();
+
+            // retrieve data from result set row
+            processResultSet(students, rs);
+
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+        }
+        return students;
     }
 }
