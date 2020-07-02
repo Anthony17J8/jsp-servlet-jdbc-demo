@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <properties>
-        <sql.version>8.0.11</sql.version>
+        <sql.version>8.0.16</sql.version>
     </properties>
 
     <dependencies>
